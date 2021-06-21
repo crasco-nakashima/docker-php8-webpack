@@ -1,0 +1,2 @@
+server/module/node_modules/*
+docker/db/data/*

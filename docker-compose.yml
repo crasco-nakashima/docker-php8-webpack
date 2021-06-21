@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  # PHP
+  web:
+    container_name: php8_web
+    build: ./docker/web
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./docker/web/php.ini:/usr/local/etc/php/php.ini
+      - ./server:/var/www
+      - ./docker/web/apache2.conf:/etc/apache2/apache2.conf
+      - ./docker/web/default-ssl.conf:/etc/apache2/sites-available/default-ssl.conf
+    depends_on:
+      - db
+
+  # MySQL
+  db:
+    image: mysql:5.7
+    container_name: php8_mysql_host
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_database
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: "Asia/Tokyo"
+    # command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --sql-mode=NO_ENGINE_SUBSTITUTION
+    volumes:
+      - ./docker/db/data:/var/lib/mysql
+      - ./docker/db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
